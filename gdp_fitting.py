@@ -37,7 +37,7 @@ chart = sns.lineplot(x=xs, y=estimated_by_linear, linestyle='--', legend='brief'
 chart.set_xticks([0, 9, 19, 29, 39, 49])
 chart.set_xticklabels([1971, 1980, 1990, 2000, 2010, 2020])
 chart.get_xaxis().set_label_text("Year")
-chart.get_yaxis().set_label_text("GDP (Trillion US$)")
+chart.get_yaxis().set_label_text("United States GDP (Trillion US$)")
 
 chart.get_figure().savefig("gdp_fitting.png")
 print("Chart is saved as gdp_fitting.png")
