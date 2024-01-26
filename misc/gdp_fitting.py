@@ -12,7 +12,7 @@ def exp(x, y0, r):
     return y0 * r**x
 
 gdp_list = []
-with open('us_gdp.csv', newline='') as csvfile:
+with open('us_gdp_world_bank.csv', newline='') as csvfile:
     reader = csv.reader(csvfile)
     for (_, gdp) in reader:
         gdp_list.append(float(gdp) / 1_000_000_000_000.0)
