@@ -53,6 +53,10 @@ fn ceil_to_nearest_multiple(x: f32, m: f32) -> f32 {
     (x / m).ceil() * m
 }
 
+/// Min and max values of the y-axis will be multile of `chart_y_block_size`.
+///
+/// For example, given min price is 0.7, max price is 1.3
+/// and `chart_y_block_size` is 0.2, the y-axis ranges from 0.6 until 1.4.
 pub fn do_chart(volatility: f32, filename: &str, chart_y_block_size: f32) {
     const GROWTH_PER_YEAR: f32 = 1.05f32;
     const DAYS: usize = 1000;
