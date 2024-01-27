@@ -43,7 +43,7 @@ normal_dist = statistics.NormalDist()
 var = statistics.variance(fluctuations)
 k95 = -normal_dist.inv_cdf((1.0 - 0.95) / 2.0)
 width = k95 * math.sqrt(var / n)
-print(f"95% confidence interval of population mean: {mean - width} - {mean + width}")
+print(f"95% confidence interval of population mean: [{mean - width}, {mean + width}]")
 
 chi2_min = chi2.ppf(0.025, df=n-1)
 chi2_max = chi2.ppf(0.975, df=n-1)
@@ -51,14 +51,14 @@ var_min = (n-1) * var / chi2_max
 stdev_min = math.sqrt(var_min)
 var_max = (n-1) * var / chi2_min
 stdev_max = math.sqrt(var_max)
-print(f"95% confidence interval of population mean: {math.sqrt(var_min)} - {math.sqrt(var_max)}")
+print(f"95% confidence interval of population standard deviation: [{math.sqrt(var_min)}, {math.sqrt(var_max)}]")
 
 palette = sns.color_palette()
 sns.set_theme()
 
 # Draw the histogram
 # Ignore outlines for easy understanding of the chart
-xticks = [-0.1, -0.05, 0.0, 0.05, 0.1]
+xticks = np.linspace(-0.1, 0.1, 5)
 fluctuations_for_histogram = [f for f in fluctuations if xticks[0] <= f <= xticks[-1]]
 chart = sns.histplot(data=fluctuations_for_histogram, stat='density', color=palette[0])
 chart.get_xaxis().set_label_text("NASDAQ-100 Daily Change")
