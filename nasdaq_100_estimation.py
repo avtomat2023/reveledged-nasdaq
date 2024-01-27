@@ -57,9 +57,14 @@ palette = sns.color_palette()
 sns.set_theme()
 
 # Draw the histogram
-# Ignore outlines for easy understanding of the chart
 xticks = np.linspace(-0.1, 0.1, 5)
-fluctuations_for_histogram = [f for f in fluctuations if xticks[0] <= f <= xticks[-1]]
+# Ignore outlines for easy understanding of the chart
+fluctuations_for_histogram = []
+for f in fluctuations:
+    if f < xticks[0] or xticks[-1] < f:
+        print(f"This outliner won't be drawn on the histogram: {f*100.0:+}%")
+        continue
+    fluctuations_for_histogram.append(f)
 chart = sns.histplot(data=fluctuations_for_histogram, stat='density', color=palette[0])
 chart.get_xaxis().set_label_text("NASDAQ-100 Daily Change")
 chart.set_xticks(xticks)
@@ -69,7 +74,7 @@ chart.set_xticklabels('±0%' if x == 0.0 else f'{int(round(x*100.0)):+}%' for x 
 dist = statistics.NormalDist(mean, stdev)
 xs = np.linspace(xticks[0], xticks[-1], num=200)
 label = f"r = {r_year*100.0:.3}% per year\nσ = {stdev*100.0:.3}%"
-sns.lineplot(x=xs, y=np.vectorize(dist.pdf)(xs), label=label, color=palette[1])
+chart = sns.lineplot(x=xs, y=np.vectorize(dist.pdf)(xs), label=label, color=palette[1])
 
 chart.get_figure().savefig("nasdaq_100.png")
-print("Chart is saved as nasdaq_100.png")
+print("Histogram is saved as nasdaq_100.png")
