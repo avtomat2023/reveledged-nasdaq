@@ -30,15 +30,15 @@ with open('nasdaq_100_investing_com.csv', newline='') as csvfile:
             continue
         fluctuations.append(f)
 
-print(f"Sampled {len(fluctuations)} fluctuations")
+n = len(fluctuations)
+print(f"Sampled {n} fluctuations")
 print(f"Max = {max(fluctuations) * 100.0:+02}%, Min = {min(fluctuations) * 100.0:+02}%")
 mean = statistics.mean(fluctuations)
 r_year = (1.0 + mean) ** 365.25 - 1.0
 print(f"Sample mean = {mean} = {r_year*100.0:.3}% per year")
 stdev = statistics.stdev(fluctuations)
-print(f"Sample standard deviation = {statistics.stdev(fluctuations)}")
+print(f"Sample standard deviation = {stdev}")
 
-n = float(len(fluctuations))
 normal_dist = statistics.NormalDist()
 var = statistics.variance(fluctuations)
 k95 = -normal_dist.inv_cdf((1.0 - 0.95) / 2.0)
