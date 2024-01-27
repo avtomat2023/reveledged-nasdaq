@@ -22,13 +22,16 @@ with open('nasdaq_100_investing_com.csv', newline='') as csvfile:
         price, date = row_to_price_date(row)
         price_prev, date_prev = row_to_price_date(row_prev)
         days = (date - date_prev).days
+        f = price / price_prev - 1.0
         if days > 1:
+            print(f"Ignored multi-day fluctuation: {date_prev} - {date} {f:+02}%")
+            continue
+        if f < -0.1 or 0.1 < f:
+            print(f"Ignored outlier: {date_prev} - {date} {f:+02}%")
             continue
         fluctuations.append(price / price_prev - 1.0)
 
 sns.set_theme()
-# Discard outliers for making the chart easy to understand
-fluctuations = [x for x in fluctuations if -0.1 <= x <= 0.1]
 chart = sns.histplot(data=fluctuations)
 chart.get_xaxis().set_label_text("NASDAQ-100 Daily Change")
 xticks = [-0.1, -0.05, 0.0, 0.05, 0.1]
