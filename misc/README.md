@@ -4,6 +4,7 @@ The files in this directory are the simulations I finally omitted from my blog p
 
 Run on Ubuntu by the following steps:
 
+1. Install pip: `sudo apt install python3-pip`
 1. Install necessary Python library: `python3 -m pip install -r requirements.txt`
 1. `python3 gdp_fitting.py`
 
