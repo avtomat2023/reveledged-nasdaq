@@ -14,14 +14,15 @@ You'll get a chart like this:
 
 ![Stock price simulation](img_for_readme/large_volatility.png)
 
-# Exponential curve fitting to United States GDP data
+# Estimation of the parameters of NASDAQ-100 daily percentage change
 
 Run on Ubuntu by the following steps:
 
 1. Install pip: `sudo apt install python3-pip`
 1. Install necessary Python libraries: `python3 -m pip install -r requirements.txt`
-1. `python3 gdp_fitting.py`
+1. `python3 nasdaq_100_estimation.py`
 
-You'll get a chart like this:
+You'll get 95% confidence intervals of the parameters on the console output.
+In addtion, you'll get a histogram like this:
 
-![Curve fitting to GDP data](img_for_readme/gdp_fitting.png)
+![NASDAQ-100 parameter estimation](img_for_readme/nasdaq_100.png)
