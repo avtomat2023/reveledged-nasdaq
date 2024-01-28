@@ -57,7 +57,7 @@ palette = sns.color_palette()
 sns.set_theme()
 
 # Draw the histogram
-xticks = np.linspace(-0.1, 0.1, 5)
+xticks = np.linspace(-0.1, 0.1, 11)
 # Ignore outlines for easy understanding of the chart
 fluctuations_for_histogram = []
 for f in fluctuations:
