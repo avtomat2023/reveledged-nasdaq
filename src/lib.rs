@@ -58,8 +58,8 @@ fn ceil_to_nearest_multiple(x: f32, m: f32) -> f32 {
 /// For example, given min price is 0.7, max price is 1.3
 /// and `chart_y_block_size` is 0.2, the y-axis ranges from 0.6 until 1.4.
 pub fn do_chart(volatility: f32, filename: &str, chart_y_block_size: f32) {
-    const GROWTH_PER_YEAR: f32 = 1.05f32;
-    const DAYS: usize = 1000;
+    const GROWTH_PER_YEAR: f32 = 1.35f32;
+    const DAYS: usize = 500;
 
     let drift = GROWTH_PER_YEAR.powf(1.0 / 365.0);
     let price_lists: Vec<Vec<_>> = (0..10).map(|_| {
