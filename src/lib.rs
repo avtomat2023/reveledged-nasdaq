@@ -70,7 +70,7 @@ pub fn do_chart(volatility: f32, filename: &str, chart_y_block_size: f32) {
     root.fill(&WHITE).unwrap();
 
     let caption = format!(
-        "Stock Price Simulations (r = {}% per year, σ = {:.1}%)",
+        "Stock Index Simulations (r = {}% per year, σ = {:.1}%)",
         ((GROWTH_PER_YEAR - 1.0) * 100.0).round() as u32,
         volatility * 100.0
     );
