@@ -70,11 +70,14 @@ chart.get_xaxis().set_label_text("NASDAQ-100 Daily Change")
 chart.set_xticks(xticks)
 chart.set_xticklabels('±0%' if x == 0.0 else f'{int(round(x*100.0)):+}%' for x in xticks)
 
+chart.get_figure().savefig("nasdaq_100.png")
+print("Histogram is saved as nasdaq_100.png")
+
 # Draw the curve with the sample mean and the sample variance
 dist = statistics.NormalDist(mean, stdev)
 xs = np.linspace(xticks[0], xticks[-1], num=200)
 label = f"r = {r_year*100.0:.3}% per year\nσ = {stdev*100.0:.3}%"
 chart = sns.lineplot(x=xs, y=np.vectorize(dist.pdf)(xs), label=label, color=palette[1])
 
-chart.get_figure().savefig("nasdaq_100.png")
-print("Histogram is saved as nasdaq_100.png")
+chart.get_figure().savefig("nasdaq_100_with_curve.png")
+print("Histogram is saved as nasdaq_100_with_curve.png")
