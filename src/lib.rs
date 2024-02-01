@@ -1,6 +1,9 @@
+use std::io::Write;
+
 use rand::prelude::*;
 use rand_distr::StandardNormal;
 use plotters::{prelude::*, element::PointCollection};
+use rayon::prelude::*;
 
 struct BlackScholesGenerator {
     value: f32,
@@ -58,8 +61,8 @@ fn ceil_to_nearest_multiple(x: f32, m: f32) -> f32 {
 /// For example, given min price is 0.7, max price is 1.3
 /// and `chart_y_block_size` is 0.2, the y-axis ranges from 0.6 until 1.4.
 pub fn do_chart(volatility: f32, filename: &str, chart_y_block_size: f32) {
-    const GROWTH_PER_YEAR: f32 = 1.35f32;
     const DAYS: usize = 500;
+    const GROWTH_PER_YEAR: f32 = 1.35f32;
 
     let drift = GROWTH_PER_YEAR.powf(1.0 / 365.0);
     let price_lists: Vec<Vec<_>> = (0..10).map(|_| {
@@ -102,4 +105,22 @@ pub fn do_chart(volatility: f32, filename: &str, chart_y_block_size: f32) {
     }
 
     println!("Chart is saved as {}", filename);
+}
+
+pub fn do_montecarlo<W: Write>(growth_per_day: f32, volatility: f32, out: &mut W, label: &str) {
+    const DAYS: usize = 5_000;
+    const SIMULATION_COUNT: usize = 50_000;
+
+    let results: Vec<_> = (0..SIMULATION_COUNT).into_par_iter().map(|_| {
+        let mut simulation = black_scholes_generator(1.0 + growth_per_day, volatility);
+        for _ in 0..DAYS-1 {
+            simulation.next();
+        }
+        simulation.next().unwrap()
+    }).collect();
+
+    writeln!(out, "# {}", label).unwrap();
+    for result in results {
+        writeln!(out, "{}", result).unwrap();
+    }
 }
