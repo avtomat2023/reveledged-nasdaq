@@ -151,7 +151,7 @@ pub fn do_chart(volatility: f32, filename: &str, chart_y_block_size: f32) {
 
 pub fn print_montecarlo<W: Write>(growth_per_day: f32, volatility: f32, seed: [u8; 16], out: &mut W, label: &str) {
     const DAYS: usize = 5_000;
-    const SIMULATION_COUNT: usize = 50_000;
+    const SIMULATION_COUNT: usize = 1_000_000;
 
     let mut seed_rng = XorShiftRng::from_seed(seed);
     let generators: Vec<_> = (0..SIMULATION_COUNT).map(|_| {
