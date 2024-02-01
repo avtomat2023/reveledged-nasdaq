@@ -7,7 +7,6 @@ import statistics
 import numpy as np
 import seaborn as sns
 from more_itertools import windowed
-from scipy.stats.distributions import chi2
 
 def row_to_price_date(row: str) -> (float, datetime.date):
     date, price, *_ = row
@@ -45,13 +44,10 @@ k95 = -normal_dist.inv_cdf((1.0 - 0.95) / 2.0)
 width = k95 * math.sqrt(var / n)
 print(f"95% confidence interval of population mean: [{mean - width}, {mean + width}]")
 
-chi2_min = chi2.ppf(0.025, df=n-1)
-chi2_max = chi2.ppf(0.975, df=n-1)
-var_min = (n-1) * var / chi2_max
-stdev_min = math.sqrt(var_min)
-var_max = (n-1) * var / chi2_min
-stdev_max = math.sqrt(var_max)
-print(f"95% confidence interval of population standard deviation: [{math.sqrt(var_min)}, {math.sqrt(var_max)}]")
+m = math.sqrt(2 * (n-1))
+stdev_min = m*stdev / (m+k95)
+stdev_max = m*stdev / (m-k95)
+print(f"95% confidence interval of population standard deviation: [{stdev_min}, {stdev_max}]")
 
 palette = sns.color_palette()
 sns.set_theme()
