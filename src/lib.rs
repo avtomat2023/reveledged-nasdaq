@@ -6,6 +6,7 @@ use plotters::{element::PointCollection, prelude::*};
 use rand::prelude::*;
 use rand_distr::StandardNormal;
 use rayon::prelude::*;
+use rand_xorshift::XorShiftRng;
 
 pub enum MontecarloConfig {
     SaveToFile {
@@ -22,6 +23,7 @@ struct BlackScholesGenerator {
     value: f32,
     drift: f32,
     volatility: f32,
+    rng: XorShiftRng,
 }
 
 impl Iterator for BlackScholesGenerator {
@@ -29,7 +31,7 @@ impl Iterator for BlackScholesGenerator {
 
     fn next(&mut self) -> Option<Self::Item> {
         let last = self.value;
-        let normal: f32 = thread_rng().sample(StandardNormal);
+        let normal: f32 = self.rng.sample(StandardNormal);
         self.value = self.drift * last + self.volatility * normal * last;
         Some(last)
     }
@@ -41,6 +43,16 @@ fn black_scholes_generator(drift: f32, volatility: f32) -> BlackScholesGenerator
         value: 1.0,
         drift,
         volatility,
+        rng: XorShiftRng::from_entropy(),
+    }
+}
+
+fn black_scholes_generator_with_seed(drift: f32, volatility: f32, seed: [u8; 16]) -> BlackScholesGenerator {
+    BlackScholesGenerator {
+        value: 1.0,
+        drift,
+        volatility,
+        rng: XorShiftRng::from_seed(seed)
     }
 }
 
@@ -137,18 +149,21 @@ pub fn do_chart(volatility: f32, filename: &str, chart_y_block_size: f32) {
     println!("Chart is saved as {}", filename);
 }
 
-pub fn print_montecarlo<W: Write>(growth_per_day: f32, volatility: f32, out: &mut W, label: &str) {
+pub fn print_montecarlo<W: Write>(growth_per_day: f32, volatility: f32, seed: [u8; 16], out: &mut W, label: &str) {
     const DAYS: usize = 5_000;
     const SIMULATION_COUNT: usize = 50_000;
 
-    let results: Vec<_> = (0..SIMULATION_COUNT)
-        .into_par_iter()
-        .map(|_| {
-            let mut simulation = black_scholes_generator(1.0 + growth_per_day, volatility);
+    let mut seed_rng = XorShiftRng::from_seed(seed);
+    let generators: Vec<_> = (0..SIMULATION_COUNT).map(|_| {
+        black_scholes_generator_with_seed(growth_per_day + 1.0, volatility, seed_rng.gen())
+    }).collect();
+
+    let results: Vec<_> = generators.into_par_iter()
+        .map(|mut gen| {
             for _ in 0..DAYS - 1 {
-                simulation.next();
+                gen.next();
             }
-            simulation.next().unwrap()
+            gen.next().unwrap()
         })
         .collect();
 
@@ -158,7 +173,7 @@ pub fn print_montecarlo<W: Write>(growth_per_day: f32, volatility: f32, out: &mu
     }
 }
 
-pub fn do_montecarlo<'a>(growth_per_day: f32, volatility: f32, config: &MontecarloConfig) {
+pub fn do_montecarlo<'a>(growth_per_day: f32, volatility: f32, seed: [u8; 16], config: &MontecarloConfig) {
     let (child, mut file): (_, Box<dyn Write>) = match config {
         MontecarloConfig::SaveToFile { filename } => {
             let file = OpenOptions::new()
@@ -198,14 +213,14 @@ pub fn do_montecarlo<'a>(growth_per_day: f32, volatility: f32, config: &Montecar
         ((1.0f32 + growth_per_day).powf(365.0) - 1.0) * 100.0,
         volatility * 100.0
     );
-    print_montecarlo(growth_per_day, volatility, &mut file, &label);
+    print_montecarlo(growth_per_day, volatility, seed, &mut file, &label);
 
     let label = format!(
         "With Reveledge (r = {:.1}% per year, σ = {:.2}%)",
         ((1.0f32 + growth_per_day * 2.0).powf(365.0) - 1.0) * 100.0,
         volatility * 2.0 * 100.0
     );
-    print_montecarlo(growth_per_day * 2.0, volatility * 2.0, &mut file, &label);
+    print_montecarlo(growth_per_day * 2.0, volatility * 2.0, seed, &mut file, &label);
 
     drop(file);
     if let Some(mut child) = child {

@@ -55,8 +55,17 @@ results = [(r.header(), list(r)) for r in ResultReaders(sys.stdin)]
 ordinary = results[0][1]
 reveledged = results[1][1]
 
-print(f"Average of ordinary: {math.pow(10, mean(ordinary))} Million Yen")
-print(f"Average of reveledged: {math.pow(10, mean(reveledged))} Million Yen")
+m1 = math.pow(10, mean(ordinary))
+m2 = math.pow(10, mean(reveledged))
+print(f"Average of ordinary: {m1} Million Yen")
+print(f"Average of reveledged: {m2} Million Yen")
+print(f"Ratio: {m2 / m1}")
+p = sum(1 for (x1, x2) in zip(ordinary, reveledged) if x1 < x2) / len(ordinary)
+print(f"Winning probability of reveledges: {p}")
+p1 = sum(1 for x in ordinary if x < 0) / len(ordinary)
+p2 = sum(1 for x in reveledged if x < 0) / len(reveledged)
+print(f"Loss probability of ordinary: {p1}")
+print(f"Loss probability of reveledged: {p2}")
 
 df = pd.DataFrame({header: data for (header, data) in results})
 sns.set_theme()

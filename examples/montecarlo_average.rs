@@ -1,5 +1,6 @@
 use reveledged_nasdaq::*;
 use std::env;
+use rand::random;
 
 fn main() {
     let growth_per_day = 0.000793784546878186;
@@ -13,5 +14,5 @@ fn main() {
             fig_filename: "montecarlo_average.png",
         },
     };
-    do_montecarlo(growth_per_day, volatility, &config);
+    do_montecarlo(growth_per_day, volatility, random(), &config);
 }
