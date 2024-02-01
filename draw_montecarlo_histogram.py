@@ -61,15 +61,29 @@ print(f"Average of reveledged: {math.pow(10, mean(reveledged))} Million Yen")
 df = pd.DataFrame({header: data for (header, data) in results})
 sns.set_theme()
 hist = sns.histplot(df, binwidth=0.1, stat='density')
-xticks = list(range(-2, 7))
-xtick_labels = ["¥10K", "¥100K", "¥1M", "¥10M", "¥100M", "¥1B", "¥10B", "¥100B", "¥1T"]
-hist.set_xlim(right=6)
+
+if len(sys.argv) >= 3:
+    xlim = (int(sys.argv[1]), int(sys.argv[2]))
+else:
+    left = math.floor(min([min(ordinary), min(reveledged)]))
+    right = math.ceil(max([max(ordinary), max(reveledged)]))
+xtick_labels = ["¥1M", "¥10M", "¥100M", "¥1B", "¥10B", "¥100B", "¥1T", "¥10T", "¥100T", "¥1K", "¥10K", "¥100K"]
+xticks = list(range(xlim[0], xlim[1] + 1))
+if xlim[0] < 0:
+    labels = xtick_labels[xlim[0]:] + xtick_labels[:xlim[1]+1]
+else:
+    labels = xtick_labels[xlim[0]:xlim[1]+1]
+hist.set_xlim(xlim)
 hist.set_xticks(xticks)
-hist.set_xticklabels(xtick_labels)
+hist.set_xticklabels(labels)
 hist.get_xaxis().set_label_text("Asset in 5,000 Days starting from 1M Yen")
 
 sns.move_legend(hist, 'lower center', bbox_to_anchor=(0.5, 1))
 plt.tight_layout()
 
-hist.get_figure().savefig('montecarlo.png')
-print("Histogram is saved as montecarlo.png")
+if len(sys.argv) >= 3:
+    filename = sys.argv[3]
+else:
+    filename = 'montecarlo.png'
+hist.get_figure().savefig(filename)
+print("Histogram is saved as", filename)

@@ -7,6 +7,17 @@ use rand::prelude::*;
 use rand_distr::StandardNormal;
 use rayon::prelude::*;
 
+pub enum MontecarloConfig {
+    SaveToFile {
+        filename: String,
+    },
+    PassToPython {
+        xlim_left: i8,
+        xlim_right: i8,
+        fig_filename: &'static str,
+    },
+}
+
 struct BlackScholesGenerator {
     value: f32,
     drift: f32,
@@ -147,9 +158,9 @@ pub fn print_montecarlo<W: Write>(growth_per_day: f32, volatility: f32, out: &mu
     }
 }
 
-pub fn do_montecarlo<'a>(growth_per_day: f32, volatility: f32, out_filename: Option<&'a str>) {
-    let (child, mut file): (_, Box<dyn Write>) = match out_filename {
-        Some(filename) => {
+pub fn do_montecarlo<'a>(growth_per_day: f32, volatility: f32, config: &MontecarloConfig) {
+    let (child, mut file): (_, Box<dyn Write>) = match config {
+        MontecarloConfig::SaveToFile { filename } => {
             let file = OpenOptions::new()
                 .write(true)
                 .create_new(true)
@@ -157,9 +168,18 @@ pub fn do_montecarlo<'a>(growth_per_day: f32, volatility: f32, out_filename: Opt
                 .unwrap();
             (None, Box::new(file))
         }
-        None => {
+        MontecarloConfig::PassToPython {
+            xlim_left,
+            xlim_right,
+            fig_filename,
+        } => {
             let mut child = Command::new("python3")
-                .arg("draw_montecarlo_histogram.py")
+                .args([
+                    "draw_montecarlo_histogram.py",
+                    &xlim_left.to_string(),
+                    &xlim_right.to_string(),
+                    fig_filename,
+                ])
                 .stdin(Stdio::piped())
                 .spawn()
                 .unwrap();
